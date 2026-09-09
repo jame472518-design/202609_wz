@@ -1,0 +1,140 @@
+/* 整站唯一有邊框的東西。它真的是一張要被截下來的卡。 */
+.result-card {
+  border: 1px solid rgba(255, 201, 74, 0.28);
+  background: rgba(20, 32, 59, 0.5);
+  padding: 2.25rem 1.5rem 1.75rem;
+  margin-bottom: 3rem;
+}
+
+.result-card h2 {
+  font-size: 0.9375rem;
+  font-weight: 300;
+  letter-spacing: 0.28em;
+  text-align: center;
+  color: var(--mist);
+  margin-bottom: 2rem;
+}
+
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 2.25rem;
+}
+
+.timeline span {
+  font-size: 0.8125rem;
+  color: rgba(147, 164, 196, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.timeline span::after {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: rgba(255, 201, 74, 0.35);
+}
+
+.timeline span:last-child { color: var(--lantern); }
+.timeline span:last-child::after { display: none; }
+
+.result-hero { text-align: center; margin-bottom: 2.25rem; }
+
+.result-hero small {
+  display: block;
+  color: var(--mist);
+  font-size: 0.8125rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+
+.result-hero strong {
+  display: block;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 6.5vw, 1.875rem);
+  line-height: 1.4;
+  color: var(--lantern);
+}
+
+.result-hero small:last-child {
+  margin: 0.75rem 0 0;
+  letter-spacing: 0.08em;
+}
+
+.result-rows { margin-bottom: 1.75rem; }
+
+.result-row {
+  display: flex;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(251, 243, 231, 0.08);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.result-row:last-child { border-bottom: 0; }
+
+.result-row dt {
+  flex: 0 0 4.5rem;
+  color: var(--mist);
+  letter-spacing: 0.08em;
+}
+
+.result-row dd { flex: 1; margin: 0; }
+
+.result-persona {
+  text-align: center;
+  color: rgba(251, 243, 231, 0.8);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 201, 74, 0.2);
+}
+
+.result-date {
+  text-align: center;
+  color: rgba(147, 164, 196, 0.7);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  margin-top: 1.5rem;
+}
+
+.closing {
+  white-space: pre-line;
+  text-align: center;
+  font-size: 1.0625rem;
+  line-height: 2.3;
+  letter-spacing: 0.02em;
+  margin-bottom: 2.5rem;
+}
+
+.result-footer { display: flex; justify-content: center; }
+.result-footer .btn-primary { align-self: center; }
+
+.hint {
+  text-align: center;
+  color: rgba(147, 164, 196, 0.75);
+  font-size: 0.875rem;
+  margin-top: 1.25rem;
+}
+
+.fallback { text-align: center; margin-top: 2rem; }
+.fallback .btn-primary { align-self: center; margin-top: 1rem; }
+
+.fallback textarea {
+  width: 100%;
+  min-height: 9rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(251, 243, 231, 0.2);
+  border-radius: 0;
+  background: none;
+  color: var(--paper);
+  font-size: 1rem;
+  line-height: 1.8;
+}

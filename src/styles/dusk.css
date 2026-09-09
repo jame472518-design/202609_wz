@@ -1,0 +1,286 @@
+/* 淡水的傍晚到夜。由後往前五層，每層只動 transform 或 opacity，
+   這兩個屬性能純粹跑在合成器上，主執行緒再忙也不掉幀。
+   刻意不動 background-position、不動漸層色停、不即時跑 SVG 濾鏡，
+   那些都要每幀重繪整個視窗，中階手機會掉到三十幀以下。 */
+
+.dusk {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--horizon) 0%, var(--dusk) 30%, var(--ink) 78%);
+}
+
+/* 一、色溫。整片天空在暖與冷之間極慢地來回，像太陽還在地平線下面移動。 */
+.dusk-warm {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255, 201, 74, 0.18) 0%,
+    rgba(107, 74, 99, 0.12) 26%,
+    transparent 62%
+  );
+  animation: warm-tide 96s ease-in-out infinite;
+}
+
+@keyframes warm-tide {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* 二、對岸的燈。兩團光在地平線附近漂移，週期用 54 與 71 秒這種除不盡的比例，
+   看不出循環。柔邊靠四段漸出停點做，不用 blur，省下每幀重新採樣的成本。 */
+.dusk-glow {
+  position: absolute;
+  inset: -15%;
+}
+
+.dusk-glow::before,
+.dusk-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.dusk-glow::before {
+  background: radial-gradient(
+    46% 34% at 30% 90%,
+    rgba(255, 111, 145, 0.26) 0%,
+    rgba(255, 111, 145, 0.15) 30%,
+    rgba(255, 111, 145, 0.06) 56%,
+    transparent 78%
+  );
+  animation: drift-spark 54s ease-in-out infinite alternate;
+}
+
+.dusk-glow::after {
+  background: radial-gradient(
+    42% 30% at 72% 96%,
+    rgba(255, 201, 74, 0.24) 0%,
+    rgba(255, 201, 74, 0.14) 30%,
+    rgba(255, 201, 74, 0.05) 56%,
+    transparent 78%
+  );
+  animation: drift-lantern 71s ease-in-out infinite alternate;
+}
+
+@keyframes drift-spark {
+  to { transform: translate3d(6%, -3%, 0) scale(1.12); }
+}
+
+@keyframes drift-lantern {
+  to { transform: translate3d(-7%, -2%, 0) scale(1.08); }
+}
+
+/* 三、星空。兩層可平鋪的星點各自往上飄，位移剛好一個 tile 的高度就無縫接回。
+   小星星慢、大星星快，兩層速度不同才有深度。星只在上半部，下面是河。 */
+.dusk-stars {
+  position: absolute;
+  inset: 0 0 46% 0;
+  overflow: hidden;
+}
+
+.dusk-stars::before,
+.dusk-stars::after {
+  content: '';
+  position: absolute;
+  inset: -320px 0;
+}
+
+.dusk-stars::before {
+  background-image:
+    radial-gradient(1.3px 1.3px at 24px 36px, rgba(251, 243, 231, 0.9), transparent),
+    radial-gradient(1px 1px at 118px 82px, rgba(251, 243, 231, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 168px 144px, rgba(255, 201, 74, 0.55), transparent),
+    radial-gradient(1px 1px at 62px 176px, rgba(251, 243, 231, 0.5), transparent);
+  background-size: 200px 200px;
+  animation: drift-near 96s linear infinite;
+}
+
+.dusk-stars::after {
+  background-image:
+    radial-gradient(1px 1px at 46px 58px, rgba(251, 243, 231, 0.55), transparent),
+    radial-gradient(1px 1px at 206px 128px, rgba(251, 243, 231, 0.4), transparent),
+    radial-gradient(1px 1px at 132px 244px, rgba(255, 201, 74, 0.35), transparent);
+  background-size: 320px 320px;
+  animation: drift-far 210s linear infinite;
+}
+
+@keyframes drift-near {
+  to { transform: translate3d(0, -200px, 0); }
+}
+
+@keyframes drift-far {
+  to { transform: translate3d(0, -320px, 0); }
+}
+
+/* 四、遠方的煙火。每隔快一分鐘，天邊安靜地開一朵，開完就沒了。
+   一朵就是一個元素加八個 box-shadow 的點，box-shadow 本身不做動畫，
+   只動 transform 與 opacity。位置避開畫面正中央，不跟文字打架。 */
+.sky-burst {
+  position: absolute;
+  inset: 0;
+}
+
+.sky-burst::before,
+.sky-burst::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.sky-burst::before {
+  top: 18%;
+  left: 16%;
+  box-shadow:
+    0 -44px 0 0 var(--spark), 31px -31px 0 0 var(--spark),
+    44px 0 0 0 var(--spark), 31px 31px 0 0 var(--spark),
+    0 44px 0 0 var(--spark), -31px 31px 0 0 var(--spark),
+    -44px 0 0 0 var(--spark), -31px -31px 0 0 var(--spark);
+  animation: sky-burst 46s ease-out infinite;
+}
+
+.sky-burst::after {
+  top: 27%;
+  left: 79%;
+  box-shadow:
+    0 -36px 0 0 var(--lantern), 25px -25px 0 0 var(--lantern),
+    36px 0 0 0 var(--lantern), 25px 25px 0 0 var(--lantern),
+    0 36px 0 0 var(--lantern), -25px 25px 0 0 var(--lantern),
+    -36px 0 0 0 var(--lantern), -25px -25px 0 0 var(--lantern);
+  animation: sky-burst 61s ease-out -23s infinite;
+}
+
+@keyframes sky-burst {
+  0% { transform: scale(0.25); opacity: 0; }
+  1.2% { opacity: 0.45; }
+  7% { transform: scale(1); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* 五、河。底下三分之一是水，承接對岸的燈火。
+   真實的倒影是縱向拉長、被橫向波紋切斷的。兩個廉價的假動作疊起來就夠像了，
+   不需要模擬流體。 */
+.river {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 32vh;
+  overflow: hidden;
+  background: linear-gradient(to bottom, rgba(20, 32, 59, 0.5) 0%, rgba(13, 20, 38, 0.88) 100%);
+}
+
+/* 倒影：把地平線的暖光鏡射下來，縱向拉長，小半徑模糊 */
+.river::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 68%;
+  background: radial-gradient(
+    120% 46% at 50% 0%,
+    rgba(255, 201, 74, 0.2) 0%,
+    rgba(255, 201, 74, 0.08) 40%,
+    transparent 72%
+  );
+  transform: scaleY(-1.7);
+  transform-origin: top;
+  filter: blur(8px);
+}
+
+/* 波紋：一組橫向細線極慢地平移，把倒影切斷 */
+.river::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 7px,
+    rgba(251, 243, 231, 0.045) 7px 8px
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 40%, #000);
+  mask-image: linear-gradient(to bottom, transparent, #000 40%, #000);
+  animation: river-drift 38s linear infinite;
+}
+
+@keyframes river-drift {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* 六、顆粒。完全靜態，但這是投報率最高的一層：
+   大面積漸層在手機的 OLED 上會走色帶，加一層雜訊之後就從色票變成有微粒的空氣。
+   雜訊是渲染一次的貼圖不是即時濾鏡，stitchTiles 讓平鋪看不出接縫。 */
+.dusk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 關掉動態的人看到的是設計好的靜止那一格，不是動畫被凍在隨機的一幀。 */
+@media (prefers-reduced-motion: reduce) {
+  .dusk-warm,
+  .dusk-glow::before,
+  .dusk-glow::after,
+  .dusk-stars::before,
+  .dusk-stars::after,
+  .river::after {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1;
+  }
+
+  .sky-burst::before,
+  .sky-burst::after {
+    animation: none !important;
+    opacity: 0;
+  }
+}
+
+/* 七、渡輪。淡水的船慢慢橫渡，九十六秒過一次。
+   船身是一張很小的 SVG 剪影，只有窗是暖色的。
+   負的 animation-delay 讓她一打開就看得到船已經在河上，不用等。 */
+.ferry {
+  position: absolute;
+  bottom: 21vh;
+  left: -14%;
+  width: 48px;
+  height: 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 22'%3E%3Cg fill='%230d1426'%3E%3Cpath d='M2 16h44l-5 5H7z'/%3E%3Crect x='12' y='8' width='24' height='8'/%3E%3Crect x='20' y='3' width='8' height='5'/%3E%3C/g%3E%3Cg fill='%23ffc94a' opacity='.75'%3E%3Crect x='15' y='11' width='3' height='3'/%3E%3Crect x='22' y='11' width='3' height='3'/%3E%3Crect x='29' y='11' width='3' height='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  animation: ferry-cross 96s linear -24s infinite;
+}
+
+/* 船燈在水面上拖出來的那道光 */
+.ferry::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 28%;
+  width: 44%;
+  height: 58px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 201, 74, 0.2) 0%,
+    rgba(255, 201, 74, 0.07) 45%,
+    transparent 80%
+  );
+}
+
+@keyframes ferry-cross {
+  to { transform: translateX(calc(100vw + 28%)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ferry {
+    animation: none !important;
+    transform: translateX(38vw);
+  }
+}

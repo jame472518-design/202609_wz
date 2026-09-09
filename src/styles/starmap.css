@@ -1,0 +1,33 @@
+/* 進度是一段星座，點的位置不等距，像真的星圖 */
+.starmap {
+  position: relative;
+  height: 12px;
+  margin-bottom: 3rem;
+}
+
+.starmap-dot {
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: rgba(251, 243, 231, 0.2);
+  transition: background-color 400ms ease, box-shadow 400ms ease;
+}
+
+.starmap-dot.lit {
+  background: var(--lantern);
+  box-shadow: 0 0 9px rgba(255, 201, 74, 0.85);
+}
+
+.starmap-line {
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 201, 74, 0.75), transparent);
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.starmap.connected .starmap-line { opacity: 1; }

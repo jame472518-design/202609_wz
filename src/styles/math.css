@@ -1,0 +1,28 @@
+/* 生日算出來的花形，結果卡的圖騰 */
+.rose { display: block; margin: 0 auto 1.5rem; }
+.rose path {
+  fill: none;
+  stroke: var(--lantern);
+  stroke-width: 0.6;
+  opacity: 0.55;
+}
+
+
+
+/* 送出之後的最後一個畫面：一顆用心臟線畫出來、正在跳的心 */
+.heart { margin-top: 2.5rem; }
+
+.heart-plot {
+  display: block;
+  width: 100%;
+  height: 240px;
+}
+
+.heart-formula {
+  text-align: center;
+  color: var(--mist);
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+}
