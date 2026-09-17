@@ -1,65 +1,44 @@
-# 給她的生日測驗網頁
+# 特別網站
 
-純靜態網頁，沒有後端，沒有任何執行期依賴。答案透過 Formspree 寄到作者的 Gmail，結果頁另外提供一張可截圖的結果卡當備援。
+送人的小網站放這裡。每個子資料夾是一個獨立的作品，彼此不共用程式碼，也不互相依賴。
 
-## 本機預覽
+## 目前有什麼
 
-因為使用 ES modules，不能直接用 `file://` 開啟，需要一個本機伺服器：
+| 資料夾 | 是什麼 | 狀態 |
+| --- | --- | --- |
+| `birthday/` | 生日測驗網頁 | 完成，2026 年 9 月 |
 
-    node serve.mjs
+## 加一個新作品
 
-然後開 http://localhost:8080
+在這一層開一個資料夾，名字用一個英文字說明它是什麼，例如 `birthday`、`christmas`、`apology`。不要在名字裡放日期，日期在 git 歷史裡。
 
-## 測試
+每個作品自己帶這幾樣，不要往上層放：
 
-    node --test tests/*.test.js
+```
+<作品>/
+  README.md     怎麼跑、怎麼改內容、上線前要做什麼
+  index.html    進入點
+  src/          程式與文案
+  tests/        測試
+  docs/         設計文件
+```
 
-端到端跑一次完整流程（用最小的 DOM 模擬，確認沒有執行期錯誤）：
+各自獨立的好處是，哪天某個作品要單獨拿出去給別人或獨立成一個 repo，整個資料夾搬走就好，不用拆依賴。
 
-    node tests/smoke.mjs
+## 共通的規則
 
-涵蓋三個純邏輯模組：狀態存取、送出內容組裝、結果卡文案組裝。畫面與互動沒有自動化測試，用設計文件裡的手動清單驗證。
+**私密的值不進版本庫。** 名字、表單網址、金鑰這類東西放在各作品的 `src/data/config.js`，版本庫裡存佔位符，本機填真實值之後執行：
 
-## 修改內容
+```
+git update-index --skip-worktree <作品>/src/data/config.js
+```
 
-所有文案與題目都在 `src/data/`，改內容不需要碰程式邏輯：
+這樣 git 就看不到本機的修改，也不會不小心推上去。副作用是之後改那個檔案 git 都不會提醒你，要恢復追蹤用 `--no-skip-worktree`。
 
-- `copy.js` 封面、結尾、送出相關文字，她的名字，以及生日日期
-- `questions.js` 第一章題目
-- `memories.js` 五顆回憶星
-- `restaurants.js` 餐廳卡與餐桌細節題
+**這個 repo 是公開的。** 寫進去的任何東西都要當成會被讀到，包含設計文件裡的來龍去脈。要放私密的內容就先確認 repo 的可見性。
 
-## 上線前必做
+**部署不走 GitHub Pages。** 因為真實值不在版本庫裡，Pages 跑出來會是佔位符版本。上線是把作品資料夾拖到 [Netlify Drop](https://app.netlify.com/drop)，它上傳的是本機檔案。
 
-1. 把 `src/data/copy.js` 的 `HER_NAME` 換成真名
-2. 用真手機跑一次完整流程
-3. 在 LINE 裡貼網址點開再跑一次，這是她最可能的使用情境
-4. 送出一次，確認 Gmail 收到主旨為「她填完了」的信
+## git
 
-## 部署
-
-把整個資料夾拖到 https://app.netlify.com/drop 就會拿到一個公開網址。
-
-## 檔案結構
-
-    index.html          進入點
-    serve.mjs           本機預覽伺服器
-    src/data/           所有文案與題目
-    src/js/             程式邏輯
-      state.js          答案狀態與 localStorage（有測試）
-      payload.js        送出內容組裝（有測試）
-      summary.js        結果卡文案組裝（有測試）
-      render.js         四種題型的卡片渲染
-      icons.js          餐廳卡的線條圖示
-      fireworks.js      綻放一次的煙火
-      ambience.js       合成的水聲與開關
-      starmap.js        星圖進度元件
-      rose.js           生日日期算出來的玫瑰線
-      heart.js          心臟線與心跳脈動
-      flow.js           章節順序與切換
-      result.js         結果頁與送出流程
-      submit.js         Formspree 呼叫
-      main.js           封面
-    src/styles/         樣式
-    tests/              純邏輯測試
-    docs/superpowers/   設計文件與實作計畫
+整個資料夾是一個 repo，遠端在 GitHub。作品是子目錄不是 submodule，一次 clone 就全部拿到。哪天某個作品需要獨立的 repo 再拆出去。
